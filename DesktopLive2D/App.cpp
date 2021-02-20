@@ -363,7 +363,41 @@ BOOL App::CreateShader()
     return TRUE;
 }
 
-void App::InitalizeCubism()
+void App::SetupShader()
+{
+    if (device == NULL || vertexFormat == NULL || vertexShader == NULL || pixelShader == NULL)
+    {
+        return;
+    }
+
+    int windowWidth, windowHeight;
+    GetClientSize(windowWidth, windowHeight);
+
+    float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    deviceContext->OMSetBlendState(blendState, blendFactor, 0xffffffff);
+
+    deviceContext->IASetInputLayout(vertexFormat);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    deviceContext->IASetInputLayout(vertexFormat);
+
+    D3D11_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = static_cast<FLOAT>(windowWidth);
+    viewport.Height = static_cast<FLOAT>(windowHeight);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    deviceContext->RSSetViewports(1, &viewport);
+    deviceContext->RSSetState(rasterizer);
+
+    deviceContext->VSSetShader(vertexShader, NULL, 0);
+
+    deviceContext->PSSetShader(pixelShader, NULL, 0);
+    deviceContext->PSSetSamplers(0, 1, &samplerState);
+}
+
+void App::InitializeCubism()
 {
     Allocator _cubismAllocator;
     Csm::CubismFramework::StartUp(&_cubismAllocator, &_cubismOption);
@@ -383,6 +417,34 @@ ID3D11Device* App::GetD3dDevice()
 ID3D11DeviceContext* App::GetD3dContext()
 {
     return deviceContext;
+}
+
+TextureManager* App::GetTextureManager()
+{
+    return textureManager;
+}
+
+void App::GetWindowRect(RECT& rect)
+{
+    if (!_instance) {
+        return;
+    }
+
+    GetClientRect(_instance->wHwnd, &rect);
+}
+
+void App::GetClientSize(int& rWidth, int& rHeight)
+{
+    if (!_instance)
+    {
+        return;
+    }
+
+    RECT clientRect;
+    GetClientRect(_instance->wHwnd, &clientRect);
+
+    rWidth = (clientRect.right - clientRect.left);
+    rHeight = (clientRect.bottom - clientRect.top);
 }
 
 void App::Run()

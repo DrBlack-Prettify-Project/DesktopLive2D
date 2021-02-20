@@ -49,11 +49,19 @@ public:
 
 	BOOL CreateShader();
 
-	void InitalizeCubism();
+	void SetupShader();
+
+	void InitializeCubism();
 
 	ID3D11Device* GetD3dDevice();
 
 	ID3D11DeviceContext* GetD3dContext();
+
+	TextureManager* GetTextureManager();
+
+	static void GetWindowRect(RECT& rect);
+
+	static void GetClientSize(int& rWidth, int& rHeight);
 
 	void Run();
 

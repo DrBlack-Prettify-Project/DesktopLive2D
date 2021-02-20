@@ -159,7 +159,10 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="TouchManager.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="View.cpp" />
   </ItemGroup>
@@ -168,7 +171,10 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="TouchManager.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="View.h" />
   </ItemGroup>
