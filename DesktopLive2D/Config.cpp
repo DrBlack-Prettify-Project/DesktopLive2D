@@ -21,6 +21,8 @@ Config::Config()
     defaultConfig = nlohmann::json();
     defaultConfig["width"] = Live2DWidth;
     defaultConfig["height"] = Live2DHeight;
+    defaultConfig["priorityForce"] = PriorityForce;
+    defaultConfig["priorityIdle"] = PriorityIdle;
 }
 
 BOOL Config::loadConfig()
@@ -32,6 +34,8 @@ BOOL Config::loadConfig()
         try {
             Live2DWidth = j["width"];
             Live2DHeight = j["height"];
+            PriorityForce = j["priorityForce"];
+            PriorityIdle = j["priorityIdle"];
         } catch(std::exception ex) {
             OutputDebugString(L"Failed to load config, recreating a new config file...\n");
             return saveConfig();
@@ -49,6 +53,8 @@ BOOL Config::saveConfig()
     nlohmann::json j;
     j["width"] = Live2DWidth;
     j["height"] = Live2DHeight;
+    j["priorityForce"] = PriorityForce;
+    j["priorityIdle"] = PriorityIdle;
     std::ofstream configFile(getConfigFilePath().c_str());
     configFile << j.dump();
     return TRUE;
@@ -57,5 +63,7 @@ BOOL Config::saveConfig()
 BOOL Config::resetConfig() {
     Live2DWidth = defaultConfig["width"];
     Live2DHeight = defaultConfig["height"];
+    PriorityForce = defaultConfig["priorityForce"];
+    PriorityIdle = defaultConfig["priorityIdle"];
     return saveConfig();
 }

@@ -20,12 +20,12 @@ using namespace Live2D::Cubism::Framework::DefaultParameterId;
 namespace {
     csmByte* CreateBuffer(const csmChar* path, csmSizeInt* size)
     {
-        return Utils::LoadFileAsBytes(path, size);
+        return ::Utils::LoadFileAsBytes(path, size);
     }
 
     void DeleteBuffer(csmByte* buffer, const csmChar* path = "")
     {
-        Utils::ReleaseBytes(buffer);
+        ::Utils::ReleaseBytes(buffer);
     }
 }
 
@@ -88,8 +88,8 @@ void Model::LoadAssets(const csmChar* dir, const csmChar* fileName)
 
 void Model::SetupModel(ICubismModelSetting* setting)
 {
-    updating = true;
-    initialized = false;
+    _updating = true;
+    _initialized = false;
 
     modelSetting = setting;
 
@@ -153,11 +153,11 @@ void Model::SetupModel(ICubismModelSetting* setting)
 
     if (modelSetting->GetEyeBlinkParameterCount() > 0)
     {
-        eyeBlink = CubismEyeBlink::Create(modelSetting);
+        _eyeBlink = CubismEyeBlink::Create(modelSetting);
     }
 
     {
-        breath = CubismBreath::Create();
+        _breath = CubismBreath::Create();
 
         csmVector<CubismBreath::BreathParameterData> breathParameters;
 
@@ -167,7 +167,7 @@ void Model::SetupModel(ICubismModelSetting* setting)
         breathParameters.PushBack(CubismBreath::BreathParameterData(idParamBodyAngleX, 0.0f, 4.0f, 15.5345f, 0.5f));
         breathParameters.PushBack(CubismBreath::BreathParameterData(CubismFramework::GetIdManager()->GetId(ParamBreath), 0.5f, 0.5f, 3.2345f, 0.5f));
 
-        breath->SetParameters(breathParameters);
+        _breath->SetParameters(breathParameters);
     }
 
     if (strcmp(modelSetting->GetUserDataFile(), "") != 0)
@@ -197,9 +197,9 @@ void Model::SetupModel(ICubismModelSetting* setting)
 
     csmMap<csmString, csmFloat32> layout;
     modelSetting->GetLayoutMap(layout);
-    modelMatrix->SetupFromLayout(layout);
+    _modelMatrix->SetupFromLayout(layout);
 
-    model->SaveParameters();
+    _model->SaveParameters();
 
     for (csmInt32 i = 0; i < modelSetting->GetMotionGroupCount(); i++)
     {
@@ -207,10 +207,10 @@ void Model::SetupModel(ICubismModelSetting* setting)
         PreloadMotionGroup(group);
     }
 
-    motionManager->StopAllMotions();
+    _motionManager->StopAllMotions();
 
-    updating = false;
-    initialized = true;
+    _updating = false;
+    _initialized = true;
 }
 
 void Model::PreloadMotionGroup(const csmChar* group)
@@ -219,7 +219,7 @@ void Model::PreloadMotionGroup(const csmChar* group)
 
     for (csmInt32 i = 0; i < count; i++)
     {
-        csmString name = Utils::CubismString::GetFormatedString("%s_%d", group, i);
+        csmString name = Live2D::Cubism::Framework::Utils::CubismString::GetFormatedString("%s_%d", group, i);
         csmString path = modelSetting->GetMotionFileName(group, i);
         path = modelHomeDir + path;
 
@@ -292,55 +292,55 @@ void Model::Update()
     const csmFloat32 deltaTimeSeconds = LAppPal::GetDeltaTime();
     userTimeSeconds += deltaTimeSeconds;
 
-    dragManager->Update(deltaTimeSeconds);
-    dragX = _dragManager->GetX();
-    dragY = _dragManager->GetY();
+    _dragManager->Update(deltaTimeSeconds);
+    _dragX = _dragManager->GetX();
+    _dragY = _dragManager->GetY();
 
     csmBool motionUpdated = false;
 
 
-    model->LoadParameters();
-    if (motionManager->IsFinished())
+    _model->LoadParameters();
+    if (_motionManager->IsFinished())
     {
-        StartRandomMotion(MotionGroupIdle, PriorityIdle);
+        StartRandomMotion(MotionGroupIdle/* Load from model json */, App::GetInstance()->config.PriorityIdle);
     }
     else
     {
-        motionUpdated = motionManager->UpdateMotion(_model, deltaTimeSeconds);
+        motionUpdated = _motionManager->UpdateMotion(_model, deltaTimeSeconds);
     }
-    model->SaveParameters();
+    _model->SaveParameters();
 
 
     if (!motionUpdated)
     {
-        if (eyeBlink != NULL)
+        if (_eyeBlink != NULL)
         {
-            eyeBlink->UpdateParameters(_model, deltaTimeSeconds);
+            _eyeBlink->UpdateParameters(_model, deltaTimeSeconds);
         }
     }
 
-    if (expressionManager != NULL)
+    if (_expressionManager != NULL)
     {
-        expressionManager->UpdateMotion(model, deltaTimeSeconds);
+        _expressionManager->UpdateMotion(_model, deltaTimeSeconds);
     }
 
-    model->AddParameterValue(idParamAngleX, _dragX * 30);
-    model->AddParameterValue(idParamAngleY, _dragY * 30);
-    model->AddParameterValue(idParamAngleZ, _dragX * _dragY * -30);
+    _model->AddParameterValue(idParamAngleX, _dragX * 30);
+    _model->AddParameterValue(idParamAngleY, _dragY * 30);
+    _model->AddParameterValue(idParamAngleZ, _dragX * _dragY * -30);
 
-    model->AddParameterValue(idParamBodyAngleX, _dragX * 10);
+    _model->AddParameterValue(idParamBodyAngleX, _dragX * 10);
 
-    model->AddParameterValue(idParamEyeBallX, _dragX);
-    model->AddParameterValue(idParamEyeBallY, _dragY);
+    _model->AddParameterValue(idParamEyeBallX, _dragX);
+    _model->AddParameterValue(idParamEyeBallY, _dragY);
 
-    if (breath != NULL)
+    if (_breath != NULL)
     {
-        breath->UpdateParameters(_model, deltaTimeSeconds);
+        _breath->UpdateParameters(_model, deltaTimeSeconds);
     }
 
-    if (physics != NULL)
+    if (_physics != NULL)
     {
-        physics->Evaluate(_model, deltaTimeSeconds);
+        _physics->Evaluate(_model, deltaTimeSeconds);
     }
 
     if (_lipSync)
@@ -349,26 +349,26 @@ void Model::Update()
 
         for (csmUint32 i = 0; i < lipSyncIds.GetSize(); ++i)
         {
-            model->AddParameterValue(lipSyncIds[i], value, 0.8f);
+            _model->AddParameterValue(lipSyncIds[i], value, 0.8f);
         }
     }
 
-    if (pose != NULL)
+    if (_pose != NULL)
     {
-        pose->UpdateParameters(model, deltaTimeSeconds);
+        _pose->UpdateParameters(_model, deltaTimeSeconds);
     }
 
-    model->Update();
+    _model->Update();
 
 }
 
 CubismMotionQueueEntryHandle Model::StartMotion(const csmChar* group, csmInt32 no, csmInt32 priority, ACubismMotion::FinishedMotionCallback onFinishedMotionHandler)
 {
-    if (priority == PriorityForce)
+    if (priority == App::GetInstance()->config.PriorityForce)
     {
-        motionManager->SetReservePriority(priority);
+        _motionManager->SetReservePriority(priority);
     }
-    else if (!motionManager->ReserveMotion(priority))
+    else if (!_motionManager->ReserveMotion(priority))
     {
         OutputDebugString(L"Cannot start motion\n");
         return InvalidMotionQueueEntryHandleValue;
@@ -376,7 +376,7 @@ CubismMotionQueueEntryHandle Model::StartMotion(const csmChar* group, csmInt32 n
 
     const csmString fileName = modelSetting->GetMotionFileName(group, no);
 
-    csmString name = Utils::CubismString::GetFormatedString("%s_%d", group, no);
+    csmString name = Live2D::Cubism::Framework::Utils::CubismString::GetFormatedString("%s_%d", group, no);
     CubismMotion* motion = static_cast<CubismMotion*>(motions[name.GetRawString()]);
     csmBool autoDelete = false;
 
@@ -442,7 +442,7 @@ void Model::Draw(Csm::CubismMatrix44& matrix)
 {
     Rendering::CubismRenderer_D3D11* renderer = GetRenderer<Rendering::CubismRenderer_D3D11>();
 
-    if (model == NULL || deleteModel || renderer == NULL)
+    if (_model == NULL || deleteModel || renderer == NULL)
     {
         return;
     }
@@ -456,7 +456,7 @@ void Model::Draw(Csm::CubismMatrix44& matrix)
 
 csmBool Model::HitTest(const csmChar* hitAreaName, csmFloat32 x, csmFloat32 y)
 {
-    if (opacity < 1)
+    if (_opacity < 1)
     {
         return false;
     }
@@ -478,7 +478,7 @@ void Model::SetExpression(const csmChar* expressionID)
 
     if (motion != NULL)
     {
-        expressionManager->StartMotionPriority(motion, false, PriorityForce);
+        _expressionManager->StartMotionPriority(motion, false, App::GetInstance()->config.PriorityForce);
     }
     else
     {
