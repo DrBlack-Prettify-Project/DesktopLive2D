@@ -13,6 +13,7 @@
 #include "App.h"
 #include "TextureManager.h"
 #include "Utils.h"
+#include "Director.h"
 
 using namespace Live2D::Cubism::Framework;
 using namespace Live2D::Cubism::Framework::DefaultParameterId;
@@ -289,7 +290,7 @@ void Model::ReleaseExpressions()
 
 void Model::Update()
 {
-    const csmFloat32 deltaTimeSeconds = LAppPal::GetDeltaTime();
+    const csmFloat32 deltaTimeSeconds = Director::GetDeltaTime();
     userTimeSeconds += deltaTimeSeconds;
 
     _dragManager->Update(deltaTimeSeconds);
@@ -302,7 +303,7 @@ void Model::Update()
     _model->LoadParameters();
     if (_motionManager->IsFinished())
     {
-        StartRandomMotion(MotionGroupIdle/* Load from model json */, App::GetInstance()->config.PriorityIdle);
+        StartRandomMotion("Idle"/* DEFAULT VALUE (Should be loaded from model json) */, App::GetInstance()->config.PriorityIdle);
     }
     else
     {

@@ -158,6 +158,7 @@
     <ClCompile Include="Allocator.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Director.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Director.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Sprite.h" />

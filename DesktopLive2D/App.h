@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "TextureManager.h"
+#include "View.h"
 
 class App
 {
@@ -16,6 +17,7 @@ private:
 	Csm::CubismFramework::Option _cubismOption;
 
 	TextureManager* textureManager;
+	View* view;
 
 	DXGI_SWAP_CHAIN_DESC presentParameters;
 	ID3D11Device* device;

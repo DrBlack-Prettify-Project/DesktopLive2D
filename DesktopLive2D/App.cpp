@@ -406,7 +406,7 @@ void App::InitializeCubism()
 
     Live2D::Cubism::Framework::Rendering::CubismRenderer_D3D11::InitializeConstantSettings(1, device);
 
-    view->InitalizeSprite();
+    view->InitializeSprite();
 }
 
 ID3D11Device* App::GetD3dDevice()
